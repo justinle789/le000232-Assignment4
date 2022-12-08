@@ -1,0 +1,45 @@
+{
+  "timezone": {
+    "HAST": {
+      "name": "Hawaiian Standard Time",
+      "abbreviation": "HAST",
+      "UTC-time": -10
+    },
+    "AK": {
+      "name": "Alaska Standard Time",
+      "abbreviation":"AK",
+      "UTC-time": -9
+    },
+    "PT": {
+      "name": "Pacific Standard Time",
+      "abbreviation":"PT",
+      "UTC-time": -8
+    },
+    "MT": {
+      "name": "Mountain Standard Time",
+      "abbreviation":"MT",
+      "UTC-time": -7
+    },
+    "CT": {
+      "name": "Central Standard Time",
+      "abbreviation":"CT",
+      "UTC-time": -6
+    },
+    "ET": {
+      "name": "Eastern Standard Time",
+      "abbreviation":"ET",
+      "UTC-time": -5
+    },
+    "AST": {
+      "name": "Alantic Standard Time",
+      "abbreviation":"AST",
+      "UTC-time": -4
+    },
+
+    "UTC": {
+      "name": "Universal Coordinated Time",
+      "abbreviation":"UTC",
+      "UTC-time": 0
+    }
+  }
+}
