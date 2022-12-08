@@ -25,14 +25,14 @@ app = Flask(__name__)
 #API : 'https://timezone.com'
 
 
-timezone = {"HAST": {"name": "Hawaiian Standard Time", "abbreviation": "HAST", "UTC-time": -10},
-    "AK": { "name": "Alaska Standard Time",       "abbreviation":"AK",  "UTC-time": -9},
-    "PT": { "name": "Pacific Standard Time",      "abbreviation":"PT",  "UTC-time": -8},
-    "MT": { "name": "Mountain Standard Time",     "abbreviation":"MT",  "UTC-time": -7},
-    "CT": { "name": "Central Standard Time",      "abbreviation":"CT",  "UTC-time": -6},
-    "ET": { "name": "Eastern Standard Time",      "abbreviation":"ET",  "UTC-time": -5},
-    "AST":{ "name": "Altantic Standard Time",      "abbreviation":"AST", "UTC-time": -4},
-    "UTC":{ "name": "Universal Coordinated Time", "abbreviation":"UTC", "UTC-time": 0}
+timezone = {-10: {"name": "Hawaiian Standard Time", "abbreviation": "HAST", "UTC-time": -10},
+    -9: { "name": "Alaska Standard Time",       "abbreviation":"AK",  "UTC-time": -9},
+    -8: { "name": "Pacific Standard Time",      "abbreviation":"PT",  "UTC-time": -8},
+    -7: { "name": "Mountain Standard Time",     "abbreviation":"MT",  "UTC-time": -7},
+    -6: { "name": "Central Standard Time",      "abbreviation":"CT",  "UTC-time": -6},
+    -5: { "name": "Eastern Standard Time",      "abbreviation":"ET",  "UTC-time": -5},
+    -4:{ "name": "Altantic Standard Time",      "abbreviation":"AST", "UTC-time": -4},
+    0:{ "name": "Universal Coordinated Time", "abbreviation":"UTC", "UTC-time": 0}
   }
 # print(time.gmtime(0))
 # currentDateAndTime = datetime.now()
@@ -66,8 +66,6 @@ class OtherTimeZones:
         self.zoneName = zoneName
         self.zoneAbbreviation = zoneAbbreviation
         self.zoneTime = zoneTime
-    def __repr__(self):
-        return " "
 
 
 @app.route('/')
@@ -78,22 +76,18 @@ def index():
 @app.post("/")
 def usersLocalTime():
     if request.is_json:
-        currentTime = time.strftime("%H:%M")        # Obtains the current time in the user's timezone
-        usersTimeZone = -1 * (time.altzone/3600)    # Obtains difference in time (in seconds) between user's local timezone and GMT. If 0, user is in GMT. If -3600, user is 1 hour behind GMT or 1 timezone away. And vice versa. In all, it calculates which timezone the user is in
-
+        zone = request.get_json()
+        currentTime = time.strftime("%H:%M")                  # Obtains the current time in the user's timezone
+        usersTimeZone = -1 * (time.altzone/3600)              # Obtains the number of hours behind Greenwitch time (GMT) - obtains timezone. Obtains difference in time (in seconds) between user's local timezone and GMT. If 0, user is in GMT. If -3600, user is 1 hour behind GMT or 1 timezone away. And vice versa. In all, it calculates which timezone the user is in.
         calculatedTimeZone = timezone[usersTimeZone]["name"]
         userProfile(calculatedTimeZone, currentTime)
-
         strLocalTime_LocalTimezone = "Your timezone: " + calculatedTimeZone  + "/nLocal time: " + currentTime
         return strLocalTime_LocalTimezone, 201
     return {"error": "Request must be Json"}, 415
 
-
+@app.post("/")
 def otherTimeZones():
-
     lstTimeZone = []
-
-
     for el in timezone:
         relativeTimeZone = userProfile.returnCalculatedTimeZone() + timezone[el]["UTC-time"]
         timeZoneName = timeZoneName[el]["name"]
