@@ -1,147 +1,95 @@
-# API that shows all timezones.
-# includes a world map that labels all timezones
-# every time the user refreshes the page, it takes the current time and converts it to the appropriate time zone.
-# does not update in real-time. Too difficult.
-
-
-# Number 1:
-# currentTime = (time.local())
-#Number 2:
-# currentDateAndTime = datetime.now()
-# formattedCurrentDateAndTime = currentDateAndTime.strftime("Local time: %H:%M, %a %b %d, %Z (%z)")
-
-
-
-
-
+# API that shows all timezones. This is located on htpp://127.0.0.1:5000/all.
+# Every time the user refreshes the page, it takes the current time and converts it to the appropriate time zone.
 
 import time
+import math
 from datetime import datetime
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, url_for, redirect
+import json
 import requests
 
 app = Flask(__name__)
-#API : 'https://timezone.com'
 
-
-timezone = {-10: {"name": "Hawaiian Standard Time", "abbreviation": "HAST", "UTC-time": -10},
-    -9: { "name": "Alaska Standard Time",       "abbreviation":"AK",  "UTC-time": -9},
-    -8: { "name": "Pacific Standard Time",      "abbreviation":"PT",  "UTC-time": -8},
-    -7: { "name": "Mountain Standard Time",     "abbreviation":"MT",  "UTC-time": -7},
-    -6: { "name": "Central Standard Time",      "abbreviation":"CT",  "UTC-time": -6},
-    -5: { "name": "Eastern Standard Time",      "abbreviation":"ET",  "UTC-time": -5},
-    -4:{ "name": "Altantic Standard Time",      "abbreviation":"AST", "UTC-time": -4},
-    0:{ "name": "Universal Coordinated Time", "abbreviation":"UTC", "UTC-time": 0}
-  }
-# print(time.gmtime(0))
-# currentDateAndTime = datetime.now()
-# newT = currentDateAndTime.strftime("%Z, %z")
-# print(newT)
-# timed = currentDateAndTime.tzname()
-# print("Timezone: " + str(timed))
-# print("time.altzone: ", time.altzone)
-
-# the easy way
-# currentTime = time.strftime("%H:%M")
-# print(currentTime)
-
-
-usersTimeZone = -1 * (time.altzone/3600)
-currentDateAndTime = datetime.now()
-formattedCurrentDateAndTime = currentDateAndTime.strftime("Local time: %H:%M, %a %b %d")
-print(formattedCurrentDateAndTime)
-
-class userProfile:
-    def __init___(self, CalculatedTimeZone, CurrentTime):
-        self.CalculatedTimeZone = CalculatedTimeZone
-        self.CurrentTime = CurrentTime
-
-    def returnCalculatedTimeZone(self):
-        return self.CalculatedTimeZone
-
-
-class OtherTimeZones:
-    def __init__(self, zoneName, zoneAbbreviation, zoneTime):
-        self.zoneName = zoneName
-        self.zoneAbbreviation = zoneAbbreviation
-        self.zoneTime = zoneTime
-
+timezone = {-11:{"name": "Midway Island Time", "abbreviation":"MIT", "UTC-time": -11},
+            -10:{"name": "Hawaiian Standard Time", "abbreviation":"HST", "UTC-time": -10},
+            -9: {"name": "Alaska Standard Time", "abbreviation": "AK", "UTC-time": -9},
+            -8: {"name": "Pacific Standard Time", "abbreviation": "PT", "UTC-time": -8},
+            -7: {"name": "Mountain Standard Time", "abbreviation": "MT", "UTC-time": -7},
+            -6: {"name": "Central Standard Time", "abbreviation": "CT", "UTC-time": -6},
+            -5: {"name": "Eastern Standard Time", "abbreviation": "ET", "UTC-time": -5},
+            -4: {"name": "Altantic Standard Time", "abbreviation": "AST", "UTC-time": -4},
+             0: {"name": "Universal Coordinated Time", "abbreviation": "UTC", "UTC-time": 0},
+            1: {"name": "European European Time", "abbreviation": "ECT", "UTC-time": 1},
+            2: {"name": "Eastern European Time", "abbreviation": "EET", "UTC-time": 2},
+            3: {"name": "Eastern African Time", "abbreviation": "EAT", "UTC-time": 3},
+            4: {"name": "Near East Time", "abbreviation": "NET", "UTC-time": 4},
+            5: {"name": "Pakistan Lahore Time", "abbreviation": "PLT", "UTC-time": 5},
+            6: {"name": "Bangladesh Standard Time", "abbreviation": "BST", "UTC-time": 6},
+            7: {"name": "Vietname Standard Time", "abbreviation": "VST", "UTC-time": 7},
+            8: {"name": "China Tiawan Time", "abbreviation": "CTT", "UTC-time": 8},
+            9: {"name": "Japan Standard Time", "abbreviation": "JST", "UTC-time": 9},
+            10: {"name": "Australia Eastern Time", "abbreviation": "AET", "UTC-time": 10},
+            11: {"name": "Solomon Standard Time", "abbreviation": "SST", "UTC-time": 11},
+}
+def _find_next_id():
+    return min(timezone["UTC-time"] for zone in timezone) + 1
 
 @app.route('/')
 def index():
-  return "<h1>Welcome to My Website</h1>"
+    return "<h1>Welcome to My Website</h1>"
 
-
-@app.post("/")
+@app.route('/userprofile')
 def usersLocalTime():
-    if request.is_json:
-        zone = request.get_json()
-        currentTime = time.strftime("%H:%M")                  # Obtains the current time in the user's timezone
-        usersTimeZone = -1 * (time.altzone/3600)              # Obtains the number of hours behind Greenwitch time (GMT) - obtains timezone. Obtains difference in time (in seconds) between user's local timezone and GMT. If 0, user is in GMT. If -3600, user is 1 hour behind GMT or 1 timezone away. And vice versa. In all, it calculates which timezone the user is in.
-        calculatedTimeZone = timezone[usersTimeZone]["name"]
-        userProfile(calculatedTimeZone, currentTime)
-        strLocalTime_LocalTimezone = "Your timezone: " + calculatedTimeZone  + "/nLocal time: " + currentTime
-        return strLocalTime_LocalTimezone, 201
-    return {"error": "Request must be Json"}, 415
 
-@app.post("/")
-def otherTimeZones():
-    lstTimeZone = []
+    currentTime = time.strftime("%H:%M")                    # Obtains the current time in the user's timezone
+    usersTimeZone = -1 * (time.altzone / 3600) - 1          # Obtains the number of hours behind Greenwitch time (GMT) - obtains timezone. Technical explanation: obtains difference in time (in seconds) between user's local timezone and GMT. If 0, user is in GMT. If -3600, user is 1 hour behind GMT or 1 timezone away. And vice versa. In all, it calculates which timezone the user is in.
+    calculatedTimeZone = timezone[usersTimeZone]["name"]    # Obtains the name of the user's timezone.
+
+
+    userProfileList = currentTime + ", " + str(usersTimeZone) + ", " + calculatedTimeZone
+
+    return jsonify(userProfileList)
+
+
+
+@app.route("/all")
+def yomask():
+
+    currentHour = time.strftime("%H")          # Obtains the current time in the user's timezone
+    currentMin = time.strftime("%M")           # Obtains the current minute
+    currentMonth = time.strftime("%b")         # Obtains the month
+    currentDay = time.strftime("%d")           # Obtains the day
+    usersTimeZone = -1 * (time.altzone / 3600) - 1
+    dz = []
+    space = " "
     for el in timezone:
-        relativeTimeZone = userProfile.returnCalculatedTimeZone() + timezone[el]["UTC-time"]
-        timeZoneName = timeZoneName[el]["name"]
-        timeZoneAbbreviation = timeZoneName[el]["abbreviation"]
-        lstTimeZone.append(otherTimeZones(timeZoneName, timeZoneAbbreviation, relativeTimeZone))
-    return lstTimeZone
+        calc = math.trunc(int(currentHour) + timezone[el]["UTC-time"] - usersTimeZone)
+        currentDay = time.strftime("%e")
+        if calc >= 24:                         # Accounts for timezones are on a different day.
+            calc -= 24
+            ji = int(currentDay) + 1
+            currentDay = str(math.trunc(ji))
+        calc = str(math.trunc(calc))
+        abbr = timezone[el]["abbreviation"]
+        utc = timezone[el]["UTC-time"]
 
 
+        nam = timezone[el]["name"]
+        killerQueen = " {:<30} {:<3} (UTC-time:{:>3}): {:>2}:{:<2}, {:>3} {:<2}{:<150}".format(nam, abbr, utc, calc,currentMin,currentMonth, currentDay, space)
+        dz.append(killerQueen)
+    return jsonify(dz)
+
+@app.route('/timezone')
+def addUserLocalTime():
+    return jsonify(timezone)
+
+@app.route('/timezone', methods=['POST'])
+def addTime():
+    timezone.append(request.get_json)
+    return '', 204
 
 
-
-
-
-
-
-
-
-if __name__=="main":
+if __name__ == "main":
     app.run
-
-# @app.route("/image/<i>")
-# def showImage(i):
-#     url = f"https://dog.ceo/api/breeds/image/random/{i}"
-#     print(url)
-#     response = requests.get(url)
-#     imagetags = response.json()["message"]
-#     return render_template("images.html",imagetags=imagetags,i=int(i))
-
-
-
-
-
-
-
-
-
-# import random
-#
-# wordBank = ["quantum", "physics", "ocular", "vile", "variant", "onning"]
-# chosenWord = random.choice(wordBank)
-#
-# stillWantsToPlay = True
-# nWrongGuesses = 0
-# firstCheck  = None
-#
-# print("Hangman\n")
-# print("If you 7 wrong gueeses, you lose.\n")
-# print("Type exit if you wish to stop playing")
-# while (stillWantsToPlay == True or nWrongGuesses != 7):
-#     userGuess = str(input("Your guess: "))
-#     firstCheck = chosenWord.find(userGuess)
-#     if firstCheck == -1:
-#         nWrongGuesses+=1
-#     else:
-#         pass
-
 
