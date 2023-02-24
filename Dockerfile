@@ -7,9 +7,10 @@ COPY ./requirements.txt /app/requirements.txt
 WORKDIR /app
 
 # install the dependencies and packages in the requirements file
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 # copy every content from the local file to the image
 COPY . /app
 
-CMD ["python","./app.py" ]
+CMD ["python3", "-m", "flask", "run", "--host=0.0.0.0"]
+#CMD ["python","./app.py"]
