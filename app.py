@@ -44,9 +44,6 @@ def yomask():
     listOfFormattedOutput = []
     space = " "
 
-    # api_url = "http://127.0.0.1:5000/all"
-    # response = requests.get(api_url)
-
     for el in timezone:
         calculatedHour = math.trunc(int(currentHour) + timezone[el]["UTC-time"] - usersTimeZone)
         currentDay = time.strftime("%e")
