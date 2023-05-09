@@ -71,15 +71,19 @@
     <meta charset="UTF-8">
     <em style="position: relative; top:90px; margin-left:50px">Creator: Justin Le</em>
     <p style="font-family:Calibri; margin-top: 120px; margin-left:50px">This application displays global timezones and their current time.</p>
-    <p style="font-family:Calibri; margin-left: 50px">I have not learned HTML in class yet. All of this work is self-learnt.</p>
-    <img src="World-Time-Zones-Map-2048x1493.jpg" alt="World Map with Timezones" style="width:60%; border:2px solid #000; margin-left: 50px">
-    {% for longStrings in longString %}
-        <p>{{ longStrings }}</p>
-    {% endfor %}
+    <p style="font-family:Calibri; margin-left:50px">Click the refresh button in your browser to update all the times.</p>
+    <p style="font-family:Calibri; margin-left: 50px">Note: I have not learned HTML in class yet. All of this work is self-learnt.</p>
+    <img src="https://gisgeography.com/wp-content/uploads/2020/11/World-Time-Zones-Map-2048x1493.jpg" alt="World Map with Timezones" style="width:70%; border:2px solid #000; margin-left: 50px">
+    <!--     <img src="World-Time-Zones-Map-2048x1493.jpg" alt="World Map with Timezones" style="width:60%; border:2px solid #000; margin-left: 50px">-->
     <py-script src="./app.py"></py-script>
+    {% for longStrings in longString %}
+        <p style="font-family:Calibri; margin-left:50px; font-size:0.8vw">{{ longStrings }}</p>
+    {% endfor %}
 </body>
 <footer>
-  <p style="margin-left: 10px">Creator's email: <a href="mailto:justinle@cmail.carleton.ca">justinle@cmail.carleton.ca</a></p>
+  <p style="font-family:Calibri; font-size:0.9vw; margin-left: 10px">Creator's email: <a href="mailto:justinle@cmail.carleton.ca">justinle@cmail.carleton.ca</a></p>
+    <p style="font-family:Calibri; ; font-size:0.9vw; margin-left: 10px"><a href="https://gisgeography.com/world-time-zone-map/">Source of picture </a></p>
+     <p style="font-family:Calibri; ; font-size:0.9vw; margin-left: 10px">Picture citation: GISGeography. "World Time Zone Map." GISGeography.com, 11 Nov. 2020, https://gisgeography.com/world-time-zone-map/</p>
 </footer>
 </html>
 

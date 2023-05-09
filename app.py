@@ -1,4 +1,4 @@
-# API that shows all timezones. This is located on htpp://127.0.0.1:5000/all.
+# API that shows all timezones.
 # Every time the user refreshes the page, it takes the current time and converts it to the appropriate time zone.
 
 import time
@@ -33,49 +33,7 @@ timezone = {-11:{"name": "Midway Island Time", "abbreviation":"MIT", "UTC-time":
             10: {"name": "Australia Eastern Time", "abbreviation": "AET", "UTC-time": 10},
             11: {"name": "Solomon Standard Time", "abbreviation": "SST", "UTC-time": 11},
 }
-# class
-# class bookInfo:
-#     def __init__(self, TimezoneName, Abbreviation, UTCtime, CalculatedHour, currentMinute, currentMonth, currentDay):
-#         self.TimezoneName = TimezoneName
-#         self.Abbreviation = Abbreviation
-#         self.UTCtime = UTCtime
-#         self.CalculatedHour = CalculatedHour
-#         self.currentMinute = currentMinute
-#         self.currentMonth = currentMonth
-#         self.currentDay = currentDay
-#
-#     def __repr__(self):
-#         return '{:<30}|{:<5}|{:<5}|{:<5}|{:<5}|{:<5}|{:<5}'.format(self.TimezoneName,
-#         self.Abbreviation,
-#         self.UTCtime,
-#         self.CalculatedHour,
-#         self.currentMinute,
-#         self.currentMonth,
-#         self.currentDay)
 
-
-
-
-
-
-def _find_next_id():
-    return min(timezone["UTC-time"] for zone in timezone) + 1
-
-@app.route('/')
-def index():
-    return "<h1>Welcome to My Website</h1>"
-
-@app.route('/userprofile')
-def usersLocalTime():
-
-    currentTime = time.strftime("%H:%M")                    # Obtains the current time in the user's timezone
-    usersTimeZone = -1 * (time.altzone / 3600) - 1          # Obtains the number of hours behind Greenwitch time (GMT) - obtains timezone. Technical explanation: obtains difference in time (in seconds) between user's local timezone and GMT. If 0, user is in GMT. If -3600, user is 1 hour behind GMT or 1 timezone away. And vice versa. In all, it calculates which timezone the user is in.
-    calculatedTimeZone = timezone[usersTimeZone]["name"]    # Obtains the name of the user's timezone.
-
-    userProfileList = currentTime + ", " + str(usersTimeZone) + ", " + calculatedTimeZone
-    return jsonify(userProfileList)
-
-@app.route("/all")
 def yomask():
 
     currentHour = time.strftime("%H")          # Obtains the current time in the user's timezone
@@ -102,15 +60,35 @@ def yomask():
         utc = timezone[el]["UTC-time"]                      # retrieves said element from above dictionary, timezone.
         nam = timezone[el]["name"]                          # retrieves said element from above dictionary, timezone.
 
-        formattedOutput = " {:<30} {:<3} (UTC-time:{:>3}): {:>2}:{:<2}, {:>3} {:<2}{:<150}".format(nam, abbr, utc, calculatedHour, currentMin, currentMonth, currentDay, space)
-        listOfFormattedOutput.append(formattedOutput)
-    return jsonify(listOfFormattedOutput)
+        formattedOutput = "{:<30} {:<3} (UTC-time:{:>3}): {:>2}:{:<2}, {:>3} {:<2}{:<10}".format(nam, abbr, utc, calculatedHour, currentMin, currentMonth, currentDay, space)
+        listOfFormattedOutput.append(formattedOutput)       # adds information (using the above format) to listOfFormattedOutput
+    return listOfFormattedOutput
 
+
+def _find_next_id():
+    return min(timezone["UTC-time"] for zone in timezone) + 1
+
+@app.route('/')
+def index():
+    #return "<h1>Welcome to My Website</h1>"
+    longString = yomask()
+    return render_template('all.html', timezone=timezone, longString=longString)
+
+@app.route('/userprofile')
+def usersLocalTime():
+
+    currentTime = time.strftime("%H:%M")                    # Obtains the current time in the user's timezone
+    usersTimeZone = -1 * (time.altzone / 3600) - 1          # Obtains the number of hours behind Greenwitch time (GMT) - obtains timezone. Technical explanation: obtains difference in time (in seconds) between user's local timezone and GMT. If 0, user is in GMT. If -3600, user is 1 hour behind GMT or 1 timezone away. And vice versa. In all, it calculates which timezone the user is in.
+    calculatedTimeZone = timezone[usersTimeZone]["name"]    # Obtains the name of the user's timezone.
+
+    userProfileList = currentTime + ", " + str(usersTimeZone) + ", " + calculatedTimeZone
+    return jsonify(userProfileList)
 
 
 @app.route('/timezone')
 def addUserLocalTime():
     return jsonify(timezone)
+
 
 @app.route('/timezone', methods=['POST'])
 def addTime():
